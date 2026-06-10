@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>颜色选择器 Demo</title>
+    <script src="../dist/index.iife.js"></script>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 32px 16px 48px;
+        background:
+          radial-gradient(circle at top, rgba(42, 117, 239, 0.12), transparent 38%),
+          linear-gradient(180deg, #f4f7fb 0%, #edf2f8 100%);
+        color: #1f2430;
+        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      .page {
+        width: min(1120px, 100%);
+        margin: 0 auto;
+        display: grid;
+        gap: 20px;
+      }
+
+      .page-header {
+        padding: 24px;
+        border: 1px solid rgba(27, 34, 48, 0.08);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.84);
+        box-shadow: 0 20px 48px rgba(15, 21, 32, 0.12);
+        backdrop-filter: blur(18px);
+      }
+
+      .page-header h1,
+      .demo-card h2,
+      .demo-card h3 {
+        margin: 0;
+      }
+
+      .page-header h1 {
+        font-size: 28px;
+      }
+
+      .page-header p {
+        margin: 12px 0 0;
+        color: #5f687a;
+        line-height: 1.6;
+      }
+
+      .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+        align-items: start;
+      }
+
+      .demo-card {
+        min-width: 0;
+        padding: 20px;
+        border: 1px solid rgba(27, 34, 48, 0.08);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.88);
+        box-shadow: 0 22px 50px rgba(15, 21, 32, 0.12);
+        backdrop-filter: blur(18px);
+      }
+
+      .demo-card p {
+        margin: 10px 0 0;
+        color: #5f687a;
+        line-height: 1.6;
+      }
+
+      .demo-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 18px 0;
+      }
+
+      .demo-button {
+        border: 0;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font: inherit;
+        cursor: pointer;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .demo-button:hover {
+        transform: translateY(-1px);
+      }
+
+      .demo-button--primary {
+        color: #ffffff;
+        background: linear-gradient(135deg, #2a75ef, #2254f4);
+        box-shadow: 0 12px 24px rgba(34, 84, 244, 0.2);
+      }
+
+      .demo-button--accent {
+        color: #1f2430;
+        background: linear-gradient(135deg, #fff1c7, #ffd77c);
+        box-shadow: 0 12px 24px rgba(255, 183, 77, 0.18);
+      }
+
+      .demo-button--ghost {
+        color: #1f2430;
+        background: #eef3ff;
+        box-shadow: inset 0 0 0 1px rgba(42, 117, 239, 0.12);
+      }
+
+      .demo-stage {
+        display: grid;
+        gap: 16px;
+      }
+
+      .demo-popup-anchor {
+        position: relative;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .demo-popup-panel {
+        position: absolute;
+        top: calc(100% + 12px);
+        left: 0;
+        z-index: 20;
+        width: min(360px, calc(100vw - 48px));
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-8px);
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+
+      .demo-popup-panel.is-open {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+
+      .demo-result {
+        display: grid;
+        gap: 14px;
+        margin-top: 16px;
+      }
+
+      .demo-result > div {
+        min-width: 0;
+      }
+
+      .demo-preview {
+        width: 100%;
+        max-width: 100%;
+        height: 96px;
+        border-radius: 14px;
+        border: 1px solid rgba(27, 34, 48, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+      }
+
+      .demo-hint {
+        color: #7c8597;
+        font-size: 13px;
+      }
+
+      .demo-code {
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        min-height: 220px;
+        padding: 14px;
+        overflow: auto;
+        border-radius: 14px;
+        background: #111827;
+        color: #d7e1ff;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .demo-meta {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+        color: #4b5565;
+        font-size: 14px;
+      }
+
+      .demo-meta strong {
+        color: #1f2430;
+      }
+
+      @media (max-width: 900px) {
+        .demo-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding-inline: 12px;
+        }
+
+        .page-header,
+        .demo-card {
+          padding: 16px;
+        }
+
+        .demo-popup-panel {
+          width: min(100%, calc(100vw - 32px));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="page-header">
+        <h1>颜色选择器双模式 Demo</h1>
+        <p>同页演示平面式和弹层式两种使用方式，支持切换纯色与渐变、初始化色板，并同步展示业务侧传入的作品颜色和组件输出结果。</p>
+      </section>
+
+      <section class="demo-grid">
+        <article class="demo-card">
+          <h2>平面式</h2>
+          <p>颜色面板始终展示，适合属性面板或侧边栏场景。</p>
+
+          <div class="demo-toolbar">
+            <button id="inline-apply-solid" class="demo-button demo-button--primary" type="button">设置作品为纯色</button>
+            <button id="inline-apply-gradient" class="demo-button demo-button--accent" type="button">设置作品为渐变</button>
+          </div>
+
+          <div class="demo-stage">
+            <somuzer-color-picker id="inline-picker" title="作品颜色" allow-gradient></somuzer-color-picker>
+          </div>
+
+          <div class="demo-result">
+            <div>
+              <div class="demo-hint">当前背景预览</div>
+              <div id="inline-preview" class="demo-preview"></div>
+            </div>
+
+            <div>
+              <div class="demo-hint">事件输出</div>
+              <pre id="inline-json" class="demo-code"></pre>
+            </div>
+          </div>
+        </article>
+
+        <article class="demo-card">
+          <h2>弹层式</h2>
+          <p>点击按钮后在旁边展开颜色面板，适合画布工具栏或悬浮编辑场景。</p>
+
+          <div class="demo-toolbar">
+            <div class="demo-popup-anchor">
+              <button id="popup-open" class="demo-button demo-button--ghost" type="button">打开颜色面板</button>
+              <div id="popup-panel" class="demo-popup-panel">
+                <somuzer-color-picker id="popup-picker" title="作品颜色" allow-gradient></somuzer-color-picker>
+              </div>
+            </div>
+            <button id="popup-apply-solid" class="demo-button demo-button--primary" type="button">设置作品为纯色</button>
+            <button id="popup-apply-gradient" class="demo-button demo-button--accent" type="button">设置作品为渐变</button>
+          </div>
+
+          <div class="demo-stage">
+            <div class="demo-hint">点击“打开颜色面板”后，会在按钮旁边展开浮层式颜色选择器。</div>
+          </div>
+
+          <div class="demo-result">
+            <div>
+              <div class="demo-hint">当前背景预览</div>
+              <div id="popup-preview" class="demo-preview"></div>
+            </div>
+
+            <div>
+              <div class="demo-hint">事件输出</div>
+              <pre id="popup-json" class="demo-code"></pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="demo-card">
+        <h3>说明</h3>
+        <div class="demo-meta">
+          <div><strong>纯色传值：</strong><code>picker.value = '#2a75ef'</code></div>
+          <div><strong>渐变传值：</strong><code>picker.value = { kind: 'linear-gradient', ... }</code></div>
+          <div><strong>色板初始化：</strong>通过 <code>picker.swatches</code> 同时传入纯色和渐变推荐色。</div>
+          <div><strong>结果读取：</strong>监听 <code>color-change</code>，同步页面预览并输出到控制台。</div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const inlinePicker = document.getElementById('inline-picker')
+      const popupPicker = document.getElementById('popup-picker')
+      const inlinePreview = document.getElementById('inline-preview')
+      const popupPreview = document.getElementById('popup-preview')
+      const inlineJson = document.getElementById('inline-json')
+      const popupJson = document.getElementById('popup-json')
+      const popupPanel = document.getElementById('popup-panel')
+
+      const solidArtworkColor = '#2a75ef'
+      const gradientArtworkColor = {
+        kind: 'linear-gradient',
+        angle: 24,
+        start: { color: '#fff2bf', opacity: 1 },
+        end: { color: '#ff7a59', opacity: 1 },
+      }
+
+      const initialSwatches = [
+        '#111827',
+        '#2a75ef',
+        '#f97316',
+        {
+          kind: 'linear-gradient',
+          angle: 90,
+          start: { color: '#22c55e', opacity: 1 },
+          end: { color: '#14b8a6', opacity: 1 },
+        },
+      ]
+
+      function clonePaint(value) {
+        if (typeof value === 'string') return value
+        return JSON.parse(JSON.stringify(value))
+      }
+
+      function hexToRgba(hex, opacity) {
+        const normalized = hex.replace('#', '')
+        const value = normalized.length === 3
+          ? normalized.split('').map((char) => char + char).join('')
+          : normalized
+        const r = Number.parseInt(value.slice(0, 2), 16)
+        const g = Number.parseInt(value.slice(2, 4), 16)
+        const b = Number.parseInt(value.slice(4, 6), 16)
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`
+      }
+
+      function toPaint(value) {
+        if (typeof value === 'string') {
+          return {
+            kind: 'solid',
+            color: value,
+            opacity: 1,
+          }
+        }
+        return clonePaint(value)
+      }
+
+      function toCssBackground(value) {
+        if (typeof value === 'string') return value
+        return `linear-gradient(${value.angle + 90}deg, ${hexToRgba(value.start.color, value.start.opacity)}, ${hexToRgba(value.end.color, value.end.opacity)})`
+      }
+
+      function toDetail(value) {
+        const paint = toPaint(value)
+        return {
+          value: typeof value === 'string' ? value : clonePaint(value),
+          paint,
+          cssBackground: toCssBackground(value),
+        }
+      }
+
+      function renderResult(previewEl, jsonEl, detail) {
+        previewEl.style.background = detail.cssBackground
+        jsonEl.textContent = JSON.stringify(
+          {
+            value: detail.value,
+            paint: detail.paint,
+            cssBackground: detail.cssBackground,
+          },
+          null,
+          2
+        )
+      }
+
+      function applyArtworkColor(mode, picker, previewEl, jsonEl, value) {
+        const clonedValue = clonePaint(value)
+        picker.value = clonedValue
+        renderResult(previewEl, jsonEl, toDetail(clonedValue))
+        console.log('artwork-color', { mode, value: clonedValue })
+      }
+
+      function bindPicker(mode, picker, previewEl, jsonEl) {
+        picker.swatches = initialSwatches.map(clonePaint)
+
+        picker.addEventListener('color-change', (event) => {
+          renderResult(previewEl, jsonEl, event.detail)
+          console.log('color-change', { mode, detail: event.detail })
+        })
+      }
+
+      function setPopupOpen(open) {
+        popupPanel.classList.toggle('is-open', open)
+      }
+
+      bindPicker('inline', inlinePicker, inlinePreview, inlineJson)
+      bindPicker('popup', popupPicker, popupPreview, popupJson)
+
+      document.getElementById('inline-apply-solid').addEventListener('click', () => {
+        applyArtworkColor('inline', inlinePicker, inlinePreview, inlineJson, solidArtworkColor)
+      })
+
+      document.getElementById('inline-apply-gradient').addEventListener('click', () => {
+        applyArtworkColor('inline', inlinePicker, inlinePreview, inlineJson, gradientArtworkColor)
+      })
+
+      document.getElementById('popup-open').addEventListener('click', () => {
+        const isOpen = popupPanel.classList.contains('is-open')
+        setPopupOpen(!isOpen)
+      })
+
+      document.getElementById('popup-apply-solid').addEventListener('click', () => {
+        setPopupOpen(true)
+        applyArtworkColor('popup', popupPicker, popupPreview, popupJson, solidArtworkColor)
+      })
+
+      document.getElementById('popup-apply-gradient').addEventListener('click', () => {
+        setPopupOpen(true)
+        applyArtworkColor('popup', popupPicker, popupPreview, popupJson, gradientArtworkColor)
+      })
+
+      popupPicker.addEventListener('close', () => {
+        setPopupOpen(false)
+      })
+
+      applyArtworkColor('inline', inlinePicker, inlinePreview, inlineJson, gradientArtworkColor)
+      applyArtworkColor('popup', popupPicker, popupPreview, popupJson, gradientArtworkColor)
+      setPopupOpen(false)
+    </script>
+  </body>
+</html>

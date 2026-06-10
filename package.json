@@ -1,0 +1,47 @@
+{
+  "name": "@somuzer/color-picker",
+  "version": "0.1.0",
+  "description": "Yidian color picker web component with solid and linear gradient support.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/somuzer/color-picker.git"
+  },
+  "homepage": "https://github.com/somuzer/color-picker#readme",
+  "bugs": {
+    "url": "https://github.com/somuzer/color-picker/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "color-picker",
+    "web-component",
+    "vue",
+    "gradient"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "vue": "^3.5.30"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.5",
+    "happy-dom": "^20.9.0",
+    "vite": "^8.0.1",
+    "vitest": "^4.1.7"
+  }
+}

@@ -1,2 +1,2 @@
 *.js linguist-language=JavaScript
-*.vue linguist-detectable=false
+*.vue linguist-vendored
